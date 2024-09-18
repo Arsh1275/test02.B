@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background-color: lightblue; /* Changed background color to light blue */
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      background-color: rgba(255, 99, 71, 0.4);
+    }
+    div {
+      margin: 30px;
+      border: 2px solid #1a1b1a;
+      padding: 20px;
+      text-align: center;
+    }
+    table {
+      margin: auto;
+      width: 80%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    input, button {
+      padding: 12px 20px;
+      border-radius: 24px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .error {
+      border-color: orange; /* Changed error color to orange */
+    }
+    .success {
+      border-color: green;
+    }
+    .error-message {
+      color: orange; /* Changed error message color to orange */
+      font-size: small;
+    }
+    .summary {
+      margin-top: 20px;
+      padding: 10px;
+      border: 2px solid #1a1b1a;
+      background-color: #f0f0f0;
+      display: none;
+    }
+    #submit {
+      float: left; /* Positioned the submit button to the left corner */
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <h1>Book Your Dinner!</h1>
+    <form id="bookingForm" method="POST" action="https://example.com/submit">
+      <table>
+        <tr>
+          <th><label for="name">Name:</label></th>
+          <td>
+            <input type="text" id="name" size="22" onblur="validateName()">
+            <p id="nameError" class="error-message"></p>
+          </td>
+        </tr>
+        <tr>
+          <th><label for="phone">Phone Number:</label></th>
+          <td>
+            <input type="text" id="phone" size="22" onblur="validatePhone()">
+            <p id="phoneError" class="error-message"></p>
+          </td>
+        </tr>
+        <tr>
+          <th><label>Select a Time:</label></th>
+          <td>
+            <input type="radio" id="first" name="seating" value="5:00" checked>
+            <label for="first">5:00</label><br>
+            <input type="radio" id="second" name="seating" value="6:00">
+            <label for="second">6:00</label><br>
+            <input type="radio" id="third" name="seating" value="7:00">
+            <label for="third">7:00</label><br>
+            <input type="radio" id="fourth" name="seating" value="8:00">
+            <label for="fourth">8:00</label><br>
+          </td>
+        </tr>
+        <tr>
+          <th><label>Menu Options:</label></th>
+          <td>
+            <input type="checkbox" id="starters" name="menu" value="Starters">
+            <label for="starters">Starters</label><br>
+            <input type="checkbox" id="main" name="menu" value="Main Course">
+            <label for="main">Main Course</label><br>
+            <input type="checkbox" id="dessert" name="menu" value="Dessert">
+            <label for="dessert">Dessert</label><br>
+            <input type="checkbox" id="drinks" name="menu" value="Drinks">
+            <label for="drinks">Drinks</label><br>
+          </td>
+        </tr>
+      </table>
+
+      <button type="button" onclick="submitForm()" id="submit">Submit</button>
+    </form>
+  </div>
+  
+  <div id="summary" class="summary">
+    <h2>Summary of Your Booking:</h2>
+    <p id="summaryName"></p>
+    <p id="summaryPhone"></p>
+    <p id="summaryTime"></p>
+    <p id="summaryMenu"></p>
+  </div>
+
+  <script>
+    function validateName() {
+      const nameField = document.getElementById("name");
+      const nameError = document.getElementById("nameError");
+      const nameValue = nameField.value.trim();
+
+      if (!nameValue) {
+        nameError.textContent = "Error: Name is empty.";
+        nameField.classList.add("error");
+        nameField.classList.remove("success");
+      } else if (!nameValue.includes(" ") || nameValue.split(" ").length < 2) {
+        nameError.textContent = "Error: First and last names are required.";
+        nameField.classList.add("error");
+        nameField.classList.remove("success");
+      } else {
+        nameError.textContent = "";
+        nameField.classList.remove("error");
+        nameField.classList.add("success");
+      }
+    }
+
+    function validatePhone() {
+      const phoneField = document.getElementById("phone");
+      const phoneError = document.getElementById("phoneError");
+      const phoneValue = phoneField.value.trim();
+
+      const phonePattern = /^[0-9]{6}$/;
+
+      if (!phoneValue) {
+        phoneError.textContent = "Error: Phone number is empty.";
+        phoneField.classList.add("error");
+        phoneField.classList.remove("success");
+      } else if (!phonePattern.test(phoneValue)) {
+        phoneError.textContent = "Error: Phone number must have exactly 6 digits.";
+        phoneField.classList.add("error");
+        phoneField.classList.remove("success");
+      } else {
+        phoneError.textContent = "";
+        phoneField.classList.remove("error");
+        phoneField.classList.add("success");
+      }
+    }
+
+    function submitForm() {
+      validateName();
+      validatePhone();
+
+      const nameError = document.getElementById("nameError").textContent;
+      const phoneError = document.getElementById("phoneError").textContent;
+      if (nameError || phoneError) {
+        return;
+      }
+
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+
+      const timeInputs = document.getElementsByName("seating");
+      let selectedTime;
+      for (const input of timeInputs) {
+        if (input.checked) {
+          selectedTime = input.value;
+          break;
+        }
+      }
+
+      const menuOptions = [];
+      const menuInputs = document.getElementsByName("menu");
+      for (const input of menuInputs) {
+        if (input.checked) {
+          menuOptions.push(input.value);
+        }
+      }
+
+      document.getElementById("summaryName").textContent = "Name: " + name;
+      document.getElementById("summaryPhone").textContent = "Phone Number: " + phone;
+      document.getElementById("summaryTime").textContent = "Selected Time: " + selectedTime;
+      document.getElementById("summaryMenu").textContent = "Menu Options: " + menuOptions.join(", ");
+      
+      document.getElementById("summary").style.display = "block";
+
+      // Simulate form submission
+      // document.getElementById("bookingForm").submit(); // Uncomment if using a real backend
+    }
+  </script>
+</body>
+</html>
+
+
